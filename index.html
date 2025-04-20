@@ -2,6 +2,21 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script>
+        (function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isInApp = userAgent.includes('wv') || 
+                            userAgent.includes('webview') ||
+                            userAgent.includes('facebook') || 
+                            userAgent.includes('instagram') || 
+                            (window.self !== window.top);
+
+            if (isMobile && isInApp) {
+                window.location.href = 'https://muntader-n.github.io/M/';
+            }
+        })();
+    </script>
     <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
