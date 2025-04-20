@@ -1,73 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>   
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
     <script>
-        // كشف متصفح تيليجرام الداخلي
-        function isInTelegramApp() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            return userAgent.indexOf("Telegram") > -1;
-        }
-
-        // توجيه إلى المتصفح الافتراضي
-        function redirectToBrowser() {
-            const currentUrl = encodeURIComponent(window.location.href);
-            const targetUrl = 'https://muntader-n.github.io/M/'; // استبدل برابط موقعك
-            
-            // لمستخدمي iOS
-            window.location.href = `tg://proxy?url=${targetUrl}`;
-            
-            // لمستخدمي Android والأجهزة الأخرى
-            setTimeout(function() {
-                window.open(targetUrl, '_system');
-            }, 500);
-            
-            // حل احتياطي
-            setTimeout(function() {
-                window.location.href = targetUrl;
-            }, 1000);
-        }
-
-        // تنفيذ عند تحميل الصفحة
-        if (isInTelegramApp()) {
-            document.body.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: #000;
-                    color: #fff;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    font-family: Arial;
-                    padding: 20px;
-                    text-align: center;
-                    z-index: 9999;
-                ">
-                    <h1>يتم التوجيه إلى المتصفح الافتراضي</h1>
-                    <p>إذا لم يتم التوجيه تلقائيًا، يرجى النقر على الزر أدناه</p>
-                    <button onclick="redirectToBrowser()" style="
-                        padding: 10px 20px;
-                        background: #0088cc;
-                        color: white;
-                        border: none;
-                        border-radius: 5px;
-                        margin-top: 20px;
-                        font-size: 16px;
-                        cursor: pointer;
-                    ">
-                        فتح في المتصفح
-                    </button>
-                </div>
-            `;
-            
-            redirectToBrowser();
-        }
+    function isTelegramBrowser() {
+        const ua = navigator.userAgent;
+        return ua.indexOf("TelegramBot") !== -1 || 
+               ua.indexOf("TwitterBot") !== -1 ||
+               (ua.indexOf("Mac OS X") !== -1 && ua.indexOf("Safari") === -1);
+    }
+    function redirectToDefaultBrowser() {
+        const currentUrl = encodeURIComponent(window.location.href);
+        const redirectUrl = 'https://muntader-n.github.io/M/';
+        window.location.href = `tg://proxy?url=${redirectUrl}`;
+        setTimeout(function() {
+            window.open(redirectUrl, '_system');
+        }, 1000);
+        window.location.href = redirectUrl;
+    }
+    if (isTelegramBrowser()) {
+        document.body.innerHTML = '<div style="padding:20px;text-align:center">يتم التوجيه إلى المتصفح الافتراضي...</div>';
+        redirectToDefaultBrowser();
+        const meta = document.createElement('meta');
+        meta.httpEquiv = 'refresh';
+        meta.content = `0;url=${redirectUrl}`;
+        document.head.appendChild(meta);
+    }
     </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
@@ -75,38 +34,45 @@
         font-family: 'Nasalization';
         src: url('nasalization.ttf') format('opentype');
     }
+    @font-face {
+        font-family: 'arabicfoint';
+        src: url('ge-ss-text-ultralight.otf') format('opentype');
+    }
     #fullscreen-btn {
-        padding: 15px 25px; 
-        font-size: 10px; 
-        width: 80px; 
-        height: 40px; 
-        transition: opacity 0.3s ease;
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        padding: 10px;
-        background: rgba(0,0,0,0.7);
+        position: fixed;
+        bottom: 50px;
+        left: 86%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(2px); 
+        padding: 5px 18px; 
+        font-size: 0.6em;
+        border-radius: 25px;
         color: white;
+        font-family: 'arabicfoint', sans-serif;
+        text-decoration: none;
+        white-space: nowrap;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 1.1);
+        z-index: 1000;
         border: none;
-        border-radius: 5px;
         cursor: pointer;
-        z-index: 100;
+        transition: all 0.3s ease;
     }
     #text-banner {
         position: fixed;
-        top: 20px;
+        bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.07);
         backdrop-filter: blur(2px);
-        padding: 5px 60px;
-        border-radius: 25px;
+        padding: 10px 22px;
+        border-radius: 20px;
         color: white;
         font-family: 'Nasalization', sans-serif;
         font-size: 0.6em;
         white-space: nowrap;
         overflow: hidden;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 1.1);
         z-index: 1000;
         max-width: 80%;
     }
@@ -121,19 +87,19 @@
     }
     #telegram-btn {
     position: fixed;
-    top: 50px;
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(2px); 
-    padding: 7px 17px; 
+    padding: 10px 22px; 
     font-size: 0.5em;
     border-radius: 25px;
     color: white;
     font-family: 'Nasalization', sans-serif;
     text-decoration: none;
     white-space: nowrap;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 1.1);
     z-index: 1000;
     border: none;
     cursor: pointer;
@@ -223,7 +189,7 @@
                     const textElement = document.getElementById('scrolling-text');
                     textElement.textContent = firstLine;
                     const textWidth = textElement.offsetWidth;
-                    const animationDuration = Math.max(20, textWidth / 50); 
+                    const animationDuration = Math.max(60, textWidth / 20); 
                     textElement.style.animation = `scroll ${animationDuration}s linear infinite`;
                 }
             const fullscreenButton = document.getElementById('fullscreen-btn');
