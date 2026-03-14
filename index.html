@@ -11,7 +11,7 @@
             --accent-green: #2ecc71;
             --accent-white: #ffffff;
             --text-color: #ffffff;
-            --radius: 20px; /* حواف منحنية عصرية */
+            --radius: 20px;
         }
 
         body, html {
@@ -22,14 +22,13 @@
             color: var(--text-color);
         }
 
-        /* خلفية متموجة PS3 Style */
+        /* خلفية متموجة */
         .ps3-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
             z-index: -1;
         }
 
-        /* واجهة التسجيل */
         #login-screen {
             display: flex; align-items: center; justify-content: center;
             height: 100vh; backdrop-filter: blur(15px);
@@ -44,53 +43,46 @@
         input {
             width: 100%; padding: 14px; margin: 12px 0; border: none; box-sizing: border-box;
             border-radius: var(--radius); background: rgba(255,255,255,0.1);
-            color: white; outline: none; transition: 0.3s; font-size: 1rem;
+            color: white; outline: none; font-size: 1rem;
         }
-
-        input:focus { background: rgba(255,255,255,0.15); box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
 
         button {
             padding: 12px 25px; border-radius: var(--radius); border: none;
-            cursor: pointer; font-weight: 600; transition: transform 0.2s, opacity 0.2s;
+            cursor: pointer; font-weight: 600; transition: 0.2s;
         }
 
-        button:active { transform: scale(0.95); }
+        .btn-login { background: var(--accent-white); color: black; width: 100%; }
 
-        .btn-login { background: var(--accent-white); color: black; width: 100%; margin-top: 15px; }
-
-        /* واجهة المحادثة */
-        #chat-screen { display: none; height: 100vh; flex-direction: column; }
+        #chat-screen { 
+            display: none; /* مخفي افتراضياً */
+            height: 100vh; flex-direction: column; 
+        }
 
         #messages-container {
             flex: 1; overflow-y: auto; padding: 25px;
             display: flex; flex-direction: column; gap: 12px;
-            scroll-behavior: smooth;
         }
 
-        /* ستايل الفقاعات */
         .msg {
             max-width: 75%; padding: 12px 18px; border-radius: 22px;
-            font-size: 1rem; line-height: 1.5; position: relative;
-            animation: slideUp 0.3s ease-out;
-            word-wrap: break-word;
+            font-size: 1rem; line-height: 1.5; word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
 
         .msg.fixed { background: var(--accent-green); color: #000; align-self: flex-start; border-bottom-right-radius: 5px; }
         .msg.temp { background: var(--accent-white); color: #000; align-self: flex-end; border-bottom-left-radius: 5px; }
 
-        /* منطقة الإدخال */
         .input-area {
-            padding: 20px; background: rgba(0,0,0,0.7);
-            display: flex; align-items: center; gap: 12px;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 20px; background: rgba(0,0,0,0.8);
+            display: flex; align-items: center; gap: 10px;
         }
 
         #msg-input { flex: 1; margin: 0; }
 
         .btn-send { background: var(--accent-green); color: black; }
-        .btn-temp { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
+        .btn-temp { background: rgba(255,255,255,0.2); color: white; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -99,7 +91,7 @@
 
 <div id="login-screen">
     <div class="card">
-        <h2 style="margin-bottom: 20px; font-weight: 300;">Private Space</h2>
+        <h2 style="font-weight: 300;">Private Space</h2>
         <input type="text" id="username" placeholder="الاسم">
         <input type="password" id="password" placeholder="كلمة المرور">
         <button class="btn-login" onclick="login()">دخول</button>
@@ -116,7 +108,6 @@
 </div>
 
 <script>
-    // الإعدادات الجديدة بناءً على طلبك
     const GIST_ID = "a6f70173868b05e20123788405cce6b8";
     const FILE_NAME = "dat.json";
     const GITHUB_TOKEN = "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";
@@ -128,9 +119,8 @@
         const passInput = document.getElementById('password').value;
         if(passInput === SECRET_PASS) {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('chat-screen').style.display = 'flex';
+            document.getElementById('chat-screen').style.display = 'flex'; // تأكيد الإظهار
             loadMessages();
-            // تحديث دوري للرسائل كل 5 ثواني
             setInterval(loadMessages, 5000);
         } else {
             alert("كلمة المرور غير صحيحة");
@@ -142,35 +132,39 @@
             const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
                 headers: { "Authorization": `token ${GITHUB_TOKEN}` }
             });
-            const data = await response.json();
             
-            // التأكد من وجود الملف بالاسم الجديد dat.json
-            if (!data.files[FILE_NAME]) {
-                console.error("الملف " + FILE_NAME + " غير موجود في الـ Gist");
-                return;
+            if (!response.ok) throw new Error("فشل الاتصال بـ GitHub");
+            
+            const data = await response.json();
+            const file = data.files[FILE_NAME];
+            
+            let content = { messages: [] };
+            if (file && file.content && file.content.trim() !== "") {
+                try {
+                    content = JSON.parse(file.content);
+                } catch(e) { console.error("JSON Error, using empty state"); }
             }
 
-            const content = JSON.parse(data.files[FILE_NAME].content);
             const container = document.getElementById('messages-container');
-            
-            // حفظ موضع التمرير
-            const isAtBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
+            const isAtBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 5;
 
             container.innerHTML = '';
             
-            // عرض الرسائل الثابتة
             if(content.messages) {
                 content.messages.forEach(m => displayMsg(m.text, 'fixed'));
             }
             
-            // عرض الرسائل المؤقتة
             tempMessages.forEach(m => displayMsg(m, 'temp'));
 
             if (isAtBottom) {
                 container.scrollTop = container.scrollHeight;
             }
         } catch (e) {
-            console.error("خطأ في جلب البيانات:", e);
+            console.error("خطأ:", e);
+            // في حال الخطأ نعرض الرسائل المؤقتة على الأقل لكي لا تبقى الشاشة سوداء
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+            tempMessages.forEach(m => displayMsg(m, 'temp'));
         }
     }
 
@@ -187,28 +181,29 @@
         if(!text) return;
 
         if(isFixed) {
-            // جلب الحالة الحالية للـ Gist
-            const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-                headers: { "Authorization": `token ${GITHUB_TOKEN}` }
-            });
-            const gistData = await res.json();
-            let content = {};
-            
+            // جلب البيانات مع معالجة الخطأ
             try {
-                content = JSON.parse(gistData.files[FILE_NAME].content);
-            } catch(e) { content = { messages: [] }; }
+                const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                    headers: { "Authorization": `token ${GITHUB_TOKEN}` }
+                });
+                const gistData = await res.json();
+                
+                let content = { messages: [] };
+                try {
+                    content = JSON.parse(gistData.files[FILE_NAME].content);
+                } catch(e) {}
 
-            if(!content.messages) content.messages = [];
-            content.messages.push({ text: text, time: new Date().toISOString() });
+                if(!content.messages) content.messages = [];
+                content.messages.push({ text: text });
 
-            // تحديث الملف dat.json
-            await fetch(`https://api.github.com/gists/${GIST_ID}`, {
-                method: 'PATCH',
-                headers: { "Authorization": `token ${GITHUB_TOKEN}` },
-                body: JSON.stringify({
-                    files: { [FILE_NAME]: { content: JSON.stringify(content) } }
-                })
-            });
+                await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                    method: 'PATCH',
+                    headers: { "Authorization": `token ${GITHUB_TOKEN}` },
+                    body: JSON.stringify({
+                        files: { [FILE_NAME]: { content: JSON.stringify(content) } }
+                    })
+                });
+            } catch(e) { alert("فشل حفظ الرسالة الثابتة"); }
         } else {
             tempMessages.push(text);
         }
