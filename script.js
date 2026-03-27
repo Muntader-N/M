@@ -2,7 +2,7 @@
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
 let aspect = window.innerWidth / window.innerHeight;
-let camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1500);
+let camera = new THREE.PerspectiveCamera(80, aspect, 0.1, 1500);
 // let camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1500);
 let cameraRotation = 0;
 let cameraRotationSpeed = 0.001;
