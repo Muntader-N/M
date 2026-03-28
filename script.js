@@ -307,10 +307,10 @@ var guiAtmosphere = gui.addFolder('Atmosphere');
 var guiAtmosphericGlow = guiAtmosphere.addFolder('Glow');
 
 // dat.gui controls object
-var cameraControls = new function () {
-  this.speed = cameraRotationSpeed;
-  this.orbitControls = !cameraAutoRotation;
-}();
+// var cameraControls = new function () {
+//  this.speed = cameraRotationSpeed;
+//  this.orbitControls = !cameraAutoRotation;
+//}();
 
 var surfaceControls = new function () {
   this.rotation = 0;
