@@ -258,7 +258,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // camera.position.set(1, 1, 1);
-camera.position.set(3, 2, 3);
+camera.position.set(4, 3, 3);
 orbitControls.enabled = !cameraAutoRotation;
 
 scene.add(camera);
