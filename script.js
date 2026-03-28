@@ -8,6 +8,7 @@ let cameraRotation = 0;
 let cameraRotationSpeed = 0.001;
 let cameraAutoRotation = true;
 let orbitControls = new THREE.OrbitControls(camera);
+orbitControls.enabled = false; // يعطل التفاعل
 
 // Lights
 let spotLight = new THREE.SpotLight(0xffffff, 1, 0, 10, 2);
